@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 using JustMVP.Web.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Logging;
 
 namespace JustMVP.Web
 {
@@ -35,16 +37,15 @@ namespace JustMVP.Web
             services.AddControllers();
 
             services.AddIdentityCore<User>()
+                .AddRoles<IdentityRole<int>>()
                 .AddEntityFrameworkStores<ApplicationContext>();
+
             services.AddSwaggerGen();
 
-            var jwtOptions = Configuration.GetSection("JwtOptions").Get<JwtOptions>();
-            services.Configure<JwtOptions>(x =>
-            {
-                x.Audience = jwtOptions.Audience;
-                x.Issuer = jwtOptions.Issuer;
-                x.Key = jwtOptions.Key;
-            });
+            var jwtOptionsConfiguration = Configuration.GetSection("JwtOptions");
+            var jwtOptions = jwtOptionsConfiguration.Get<JwtOptions>();
+
+            services.Configure<JwtOptions>(jwtOptionsConfiguration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -71,6 +72,7 @@ namespace JustMVP.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                IdentityModelEventSource.ShowPII = true;
             }
 
             app.UseHttpsRedirection();

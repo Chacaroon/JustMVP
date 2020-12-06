@@ -35,6 +35,7 @@ namespace JustMVP.DAL
 
         public DbSet<Robot> Robots { get; set; }
         public DbSet<Job> Jobs { get; set; }
+        public DbSet<UserRobot> UserRobots { get; set; }
 
         private void ConfigureUsers(ModelBuilder modelBuilder)
         {

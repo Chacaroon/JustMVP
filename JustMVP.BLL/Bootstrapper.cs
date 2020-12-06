@@ -13,11 +13,6 @@ namespace JustMVP.BLL
                 .Where(x => x.Name.EndsWith("Service"))
                 .AsImplementedInterfaces();
 
-            container.RegisterType<UserManager<User>>()
-                .AsSelf();
-            container.RegisterType<RoleManager<IdentityRole>>()
-                .AsSelf();
-
             DAL.Bootstrapper.Bootstrap(container);
         }
     }

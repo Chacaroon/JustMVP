@@ -5,9 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using JustMVP.BLL.Interfaces;
-using JustMVP.Domain;
 using JustMVP.Domain.Infrastructure.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,19 +13,16 @@ namespace JustMVP.BLL
 {
     public class TokenService : ITokenService
     {
-        private readonly IOptions<JwtOptions> _jwtOptions;
-        private readonly UserManager<User> _userManager;
+        private readonly JwtOptions _jwtOptions;
 
-        public TokenService(IOptions<JwtOptions> jwtOptions, 
-            UserManager<User> userManager)
+        public TokenService(IOptions<JwtOptions> jwtOptions)
         {
-            _jwtOptions = jwtOptions;
-            _userManager = userManager;
+            _jwtOptions = jwtOptions.Value;
         }
 
         public string GenerateJwt(int userId, string userName)
         {
-            var key = _jwtOptions.Value.IssuerSigningKey;
+            var key = _jwtOptions.IssuerSigningKey;
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -35,7 +30,10 @@ namespace JustMVP.BLL
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()), 
                     new Claim(ClaimTypes.Name, userName), 
                 }),
-                Expires = DateTime.MaxValue,
+                Expires = DateTime.Now.AddDays(7),
+                NotBefore = DateTime.Now,
+                Audience = _jwtOptions.Audience,
+                Issuer = _jwtOptions.Issuer,
                 SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
             };
 

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using JustMVP.Domain;
+using JustMVP.Web.Models.Job;
 
-namespace JustMVP.Domain
+namespace JustMVP.Web.Models.Robot
 {
-    public class Robot : BaseEntity
+    public class RobotModel
     {
         public string Name { get; set; }
 
         public RobotStatus Status { get; set; }
 
-        public int? CurrentJobId { get; set; }
-
-        public Job? CurrentJob { get; set; }
+        public JobModel Job { get; set; }
 
         [Range(0, 100)]
         public int BatteryLevel { get; set; }
@@ -21,7 +22,5 @@ namespace JustMVP.Domain
         public bool AvailableForChildren { get; set; }
 
         public int OwnerUserId { get; set; }
-
-        public IEnumerable<UserRobot> UserRobots { get; set; }
     }
 }
