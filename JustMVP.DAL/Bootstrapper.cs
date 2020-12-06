@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-using Autofac;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace JustMVP.DAL
 {
@@ -9,17 +9,10 @@ namespace JustMVP.DAL
     {
         public static void Bootstrap(ContainerBuilder container)
         {
-            container.Register(ctx =>
-                {
-                    var connectionString = ctx.Resolve<IConfiguration>().GetConnectionString("JustMVP");
+            var serviceCollection = new ServiceCollection()
+                .AddDbContext<ApplicationContext>();
 
-                    var dbContextOptions = new DbContextOptionsBuilder<ApplicationContext>()
-                        .UseSqlServer(connectionString)
-                        .Options;
-
-                    return new ApplicationContext(dbContextOptions);
-                })
-                .InstancePerLifetimeScope();
+            container.Populate(serviceCollection);
 
             container.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
                 .Where(x => x.Name.EndsWith("Repository"))

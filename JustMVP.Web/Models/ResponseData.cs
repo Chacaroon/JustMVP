@@ -37,6 +37,17 @@ namespace JustMVP.Web.Models
         public ErrorResponseData Error { get; }
     }
 
+    public class ResponseData : ResponseData<object>
+    {
+        public ResponseData(ErrorTypeEnum errorType) : base(errorType)
+        {
+        }
+
+        public ResponseData(ErrorTypeEnum errorType, object error) : base(errorType, error)
+        {
+        }
+    }
+
     public class ErrorResponseData
     {
         public ErrorTypeEnum ErrorType { get; set; }

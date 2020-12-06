@@ -1,25 +1,17 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autofac;
-using Autofac.Builder;
 using JustMVP.DAL;
 using JustMVP.Domain;
 using JustMVP.Domain.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using JustMVP.Web.Models;
 
 namespace JustMVP.Web
 {
@@ -68,7 +60,7 @@ namespace JustMVP.Web
                         ValidAudience = jwtOptions.Audience,
 
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = jwtOptions.IssuerSigningKey 
+                        IssuerSigningKey = jwtOptions.IssuerSigningKey
                     };
                 });
         }
@@ -93,6 +85,18 @@ namespace JustMVP.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.Use(async (httpContext, next) =>
+            {
+                try
+                {
+                    await next();
+                }
+                catch
+                {
+                    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(new ResponseData(ErrorTypeEnum.Unknown)));
+                }
+            });
 
             app.UseEndpoints(endpoints =>
             {
